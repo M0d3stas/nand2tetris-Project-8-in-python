@@ -10,6 +10,19 @@ class Parser():
         self.__just_filename = ''
         self.__instLine = lineOfInstrunction
         self.__command = Command()
+        self.__parsedCommands = []
+
+
+    def readFile(self):
+        with open(self.__filename, 'r') as f:
+            for line in f:
+                self.insertLine(line)
+                instrunction = self.parseCommand()
+                if instrunction.getValid():
+                    self.__parsedCommands.append(instrunction)
+
+    def returnParsedCommands(self):
+        return self.__parsedCommands
 
     def parseFilename(self):
             

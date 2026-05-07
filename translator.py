@@ -203,18 +203,11 @@ class Translator():
                 
                 elif arg1 == 'temp':
                     fullAsmCmd += f'//pop temp {arg2}\n'
-                    fullAsmCmd +=f'@5\n' #A=5
-                    fullAsmCmd +=f'D=A\n' #D=5
-                    fullAsmCmd +=f'@{arg2}\n' #A=arg2
-                    fullAsmCmd +=f'D=D+A\n' #D+arg2
-                    fullAsmCmd +=f'@R12\n' #A=12
-                    fullAsmCmd +=f'M=D\n' #M[12]=D
-                    fullAsmCmd +=f'@SP\n' #A=0
-                    fullAsmCmd +=f'AM=M-1\n'#A=M=M[0]-1
-                    fullAsmCmd +=f'D=M\n' #D=*SP
-                    fullAsmCmd +=f'@R12\n' #A=12
-                    fullAsmCmd +=f'A=M\n' #A=M[12]
-                    fullAsmCmd +=f'M=D\n' #*r12/*ARG = D
+                    fullAsmCmd += f'@SP\n'
+                    fullAsmCmd += f'AM=M-1\n'
+                    fullAsmCmd += f'D=M\n'
+                    fullAsmCmd += f'@{5 + int(arg2)}\n'  # fixed address: 5 + index
+                    fullAsmCmd += f'M=D\n'
 
                 elif arg1 == 'pointer':
                     if arg2 == '1':
@@ -377,16 +370,17 @@ class Translator():
                     fullAsmCmd += f'@SP\n'
                     fullAsmCmd += f'M=M+1\n' #*SP + 1 
 
-                if arg1 == "Sys.init":
-                    functionInfo = FunctionCallInfo(arg1,arg2,1)
-                    self.__callFInfo.addFunctionName(arg1)
-                    self.__callerStack.addFunction(functionInfo)
+                    
+                functionInfo = FunctionCallInfo(arg1,arg2,1)
+                
+                self.__callerStack.addFunction(functionInfo)
             elif cmd1 == "call":
-                self.__callFInfo.addFunctionName(arg1)
+                
+                
                 insadeFunctionName = self.__callerStack.returnLast().returnFunctionName()
-                counter = self.__callFInfo.returnCountName(insadeFunctionName)
-                functionInfo = FunctionCallInfo(arg1,arg2,counter)
-                fullAsmCmd += f'//Call {self.__filename}.{arg1} {arg2}\n'
+                counter = self.__callerStack.returnLast().returnCounter()
+                
+                fullAsmCmd += f'//Call {arg1} {arg2}\n'
 
                 #SAVE TO STACK
                 fullAsmCmd += f'//Push working reg to stack\n'
@@ -454,10 +448,10 @@ class Translator():
                 fullAsmCmd += f'@{arg1}\n'
                 fullAsmCmd += f'0;JMP\n'
                 fullAsmCmd += f'({insadeFunctionName}$ret.{counter})\n'
-            
-                self.__callerStack.addFunction(functionInfo)
-                print(functionInfo.returnFunctionName())
+
+                self.__callerStack.incrementCounter()
             elif cmd1 == 'return':
+                
 
                 fullAsmCmd += f'//Return\n'
                 fullAsmCmd += f'@LCL\n'

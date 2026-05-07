@@ -6,7 +6,11 @@ class FunctionCallInfo():
 
     def returnFunctionName(self):
         return self.__function_name
+    
+    def increaseCounter(self):
+        self.__counter += 1
     def returnArgCount(self):
         return self.__arg_count
+    
     def returnCounter(self):
         return self.__counter

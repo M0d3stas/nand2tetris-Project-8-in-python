@@ -21,12 +21,8 @@ def main():
     instructions = []
     parser = Parser(vm_file)
 
-    with open(vm_file, 'r') as f:
-        for line in f:
-            parser.insertLine(line)
-            instruction = parser.parseCommand()
-            if instruction.getValid():
-                instructions.append(instruction)
+    parser.readFile()
+    instructions = parser.returnParsedCommands()
 
     translator = Translator(parser.parseFilename(), instructions)
     text = translator.translateCommands()
